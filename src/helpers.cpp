@@ -46,7 +46,7 @@ Vector3::Vector3()
     data[2] = 0;
 }
 
-Vector3::Vector3(int i, int j, int k)
+Vector3::Vector3(double i, double j, double k)
 {
     data[0] = i;
     data[1] = j;

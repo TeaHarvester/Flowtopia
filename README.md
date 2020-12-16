@@ -1,6 +1,8 @@
 Flowtopia
 ========
-A fluid dynamics repository perfect for solving the motion of a stationary box-shaped fluid
+A fluid dynamics repository that simply works.
+
+<sub><sup>for special cases<sup><sub>
 
 Dependencies
 -------- 

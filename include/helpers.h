@@ -14,7 +14,7 @@ struct Vector3
     Vector3 operator*(Vector3& a);
     Vector3 operator/(Vector3& a);
     Vector3();
-    Vector3(int i, int j, int k);
+    Vector3(double i, double j, double k);
     Vector3(const Vector3& copy);
     ~Vector3();
 };

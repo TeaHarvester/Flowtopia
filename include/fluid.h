@@ -7,8 +7,9 @@
 class Fluid
 {
     public:
-    // void InitialiseFluid();
+    void InitialiseVortex();
     void FiniteDifference();
+    void PrintFluid();
     Fluid(unsigned int x_dim, unsigned int y_dim, unsigned int z_dim, double k_visc);
     ~Fluid();
     private:
