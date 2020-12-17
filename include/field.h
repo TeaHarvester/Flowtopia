@@ -10,6 +10,7 @@
 struct VectorField
 {
     unsigned int x_size, y_size, z_size;
+    double norm_coeff;
     Vector3** map;
     Vector3*& operator() (unsigned int x, unsigned int y, unsigned int z);
     VectorField(unsigned int x_dim, unsigned int y_dim, unsigned int z_dim);

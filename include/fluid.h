@@ -8,6 +8,7 @@ class Fluid
 {
     public:
     unsigned int x_size, y_size, z_size;
+    VectorField* u;
     void InitialiseVortex();
     void FiniteDifference();
     void PrintFluid();
@@ -15,7 +16,6 @@ class Fluid
     ~Fluid();
     private:
     double k_visc;
-    VectorField* u;
     ScalarField* density;
 
 };

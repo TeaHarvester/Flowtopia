@@ -20,6 +20,12 @@ void Fluid::InitialiseVortex()
 
                     (*(*u)(i, j, k))(0) = param*param2*((((double)y_size - 1.0)/2.0) - (double)j);
                     (*(*u)(i, j, k))(1) = param*param2*((double)i - (((double)x_size - 1.0)/2.0));
+                    double magnitude = (*u)(i, j, k)->Magnitude();
+
+                    if (magnitude > u->norm_coeff)
+                    {
+                        u->norm_coeff = magnitude;
+                    }
                 }
             }
         }
@@ -38,6 +44,7 @@ void Fluid::FiniteDifference()
     const double a = t_step/x_step;
 
     VectorField* new_u = (new VectorField(*u));
+    new_u->norm_coeff = 0;
 
     for (unsigned int i = 0; i < x_size; ++i)
     {
@@ -74,6 +81,14 @@ void Fluid::FiniteDifference()
                     double& a_w = (*(*u)(i, j, k-sign))(2);
                     w_1 += a*w_0*(w_a - w_0) + (pow(a,2.0)/t_step)*k_visc*(w_a - 2*w_0 + a_w); 
                 }
+
+                double magnitude = (*new_u)(i, j, k)->Magnitude();
+
+                if (magnitude > new_u->norm_coeff)
+                {
+                    new_u->norm_coeff = magnitude;
+                }
+
             }
         }
     }
@@ -86,7 +101,6 @@ void Fluid::PrintFluid()
 {
     std::cout << std::fixed;
     std::cout << std::setprecision(7);
-
 
     for (unsigned int k = 0; k < z_size; ++k)
     {

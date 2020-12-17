@@ -9,7 +9,8 @@ VectorField::VectorField(unsigned int x_dim, unsigned int y_dim, unsigned int z_
 :
 x_size(x_dim),
 y_size(y_dim),
-z_size(z_dim)
+z_size(z_dim),
+norm_coeff(0.0)
 {
     map = new Vector3*[x_size * y_size * z_size];
 
@@ -23,7 +24,8 @@ VectorField::VectorField(const VectorField& copy)
 :
 x_size(copy.x_size),
 y_size(copy.y_size),
-z_size(copy.z_size)
+z_size(copy.z_size),
+norm_coeff(copy.norm_coeff)
 {
     map = new Vector3*[x_size * y_size * z_size];
 

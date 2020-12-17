@@ -28,6 +28,12 @@ Vector3 Vector3::operator*(Vector3& a)
     return Vector3((*this)(1) * a(1), (*this)(2) * a(2), (*this)(3) * a(3));
 }
 
+// division by scalar
+Vector3 Vector3::operator/(double a)
+{
+    return Vector3((*this)(1) / a, (*this)(2) / a, (*this)(3) / a);
+}
+
 // element-wise division
 Vector3 Vector3::operator/(Vector3& a)
 {
@@ -37,6 +43,11 @@ Vector3 Vector3::operator/(Vector3& a)
 double Vector3::Dot(Vector3& operand)
 {
     return data[0]*operand.data[0] + data[1]*operand.data[1] + data[2]*operand.data[2];
+}
+
+double Vector3::Magnitude()
+{
+    return sqrt(this->Dot(*this));
 }
 
 Vector3::Vector3()
