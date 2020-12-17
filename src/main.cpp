@@ -4,6 +4,8 @@
 
 void Render();
 
+void Timer(int state);
+
 struct GraphicObject
 {
     unsigned int n_grid_vertices;
@@ -12,7 +14,7 @@ struct GraphicObject
     unsigned int* grid_index_array;
     float* arrow_vertex_array;
     Fluid* source;
-
+    void GetArrowVertexArray();
     GraphicObject(Fluid& f);
     ~GraphicObject();
 };
@@ -48,10 +50,11 @@ int main(int argc, char **argv)
 
     // register callbacks
     glutDisplayFunc(Render);
+    glutTimerFunc(15, Timer, 0);
 
     // enter the processing loop
     glutMainLoop();
-
+    
     std::cout << "hellow fluid" << std::endl;
 
     return 0;
@@ -94,9 +97,9 @@ void Render()
     for (unsigned int i = 0; i < n_arrows; ++i)
     {   
         // arrowheads
-        float xh = VAO[i*7] + VAO[i*7 + 3];
-        float yh = VAO[i*7 + 1] + VAO[i*7 + 4];
-        float zh = VAO[i*7 + 2] + VAO[i*7 + 5];
+        float xh = VAO[i*7] + 1.5*VAO[i*7 + 3];
+        float yh = VAO[i*7 + 1] + 1.5*VAO[i*7 + 4];
+        float zh = VAO[i*7 + 2] + 1.5*VAO[i*7 + 5];
 
         // arrow tails
         float xt = VAO[i*7];
@@ -117,14 +120,22 @@ void Render()
         yh *= n / w;
         zh = ((zh * (-(f + n) / (f - n))) - (2*n*f / (f - n))) / w;
 
-        glColor4f(0.2f, 0.5f, 0.7f, VAO[i*7 + 6]);
+        glColor4f(1.0f - VAO[i*7 + 6], 0.0f + VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
         glVertex3f(xt, yt, zt);
-        glColor4f(0.2f, 0.5f, 0.7f, VAO[i*7 + 6]);
+        glColor4f(0.0f + VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
         glVertex3f(xh, yh, zh);
     }
     glEnd();
 
     glutSwapBuffers();
+}
+
+void Timer(int state)
+{
+    gl_input->source->FiniteDifference();
+    gl_input->GetArrowVertexArray();
+    glutPostRedisplay();
+    glutTimerFunc(15, Timer, state);
 }
 
 GraphicObject::GraphicObject(Fluid& F)
@@ -146,6 +157,7 @@ source(&F)
 
     grid_vertex_array = new float[n_grid_vertices * 7];
     grid_index_array = new unsigned int[n_grid_indices * 2];
+    arrow_vertex_array = new float[lx*ly*lz*7];
 
     unsigned int index_iterator = 0;
 
@@ -160,8 +172,8 @@ source(&F)
                 grid_vertex_array[iterator] = ((float)i + 1.0f)*dx - 1.0f;
                 grid_vertex_array[iterator + 1] = ((float)j + 1.0f)*dy - 1.0f;
                 grid_vertex_array[iterator + 2] = ((float)k + 1.0f)*dz + 1.0f;
-                grid_vertex_array[iterator + 3] = 1.0f;
-                grid_vertex_array[iterator + 4] = 0.0f;
+                grid_vertex_array[iterator + 3] = 0.8f;
+                grid_vertex_array[iterator + 4] = 0.8f;
                 grid_vertex_array[iterator + 5] = 1.0f;
                 grid_vertex_array[iterator + 6] = 0.2f;
 
@@ -189,9 +201,20 @@ source(&F)
         }
     }
 
-    // write arrow arrays
+    GetArrowVertexArray();
+}
 
-    arrow_vertex_array = new float[lx*ly*lz*7];
+void GraphicObject::GetArrowVertexArray()
+{
+    // write arrow arrays
+    unsigned int lx = source->x_size + 1;
+    unsigned int ly = source->y_size + 1;
+    unsigned int lz = source->z_size + 1;
+
+    float dx = 2/((float)lx + 1);
+    float dy = 2/((float)ly + 1);
+    float dz = 2/((float)lz + 1);
+
     float norm_coeff = (float)source->u->norm_coeff;
 
     for (unsigned int k = 0; k < lz - 1; ++k)
@@ -210,10 +233,10 @@ source(&F)
 
                 Vector3* flow = (*source->u)(i, j, k);
 
-                arrow_vertex_array[iterator + 3] = dx*(*flow)(0)/norm_coeff;
-                arrow_vertex_array[iterator + 4] = dy*(*flow)(1)/norm_coeff;
-                arrow_vertex_array[iterator + 5] = dz*(*flow)(2)/norm_coeff;
-                arrow_vertex_array[iterator + 6] = 0.5f;
+                arrow_vertex_array[iterator + 3] = dx*(float)(*flow)(0)/norm_coeff;
+                arrow_vertex_array[iterator + 4] = dy*(float)(*flow)(1)/norm_coeff;
+                arrow_vertex_array[iterator + 5] = dz*(float)(*flow)(2)/norm_coeff;
+                arrow_vertex_array[iterator + 6] = (float)flow->Magnitude()/norm_coeff;
             }
         }
     }

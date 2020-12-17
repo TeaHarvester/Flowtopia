@@ -5,7 +5,9 @@
 
 void Fluid::InitialiseVortex()
 {
-    double param = 1.0/(double)x_size;
+    srand(2938436);
+
+    double param = 2/(double)x_size;
 
     for (unsigned int i = 0; i < x_size; ++i)
     {
@@ -39,12 +41,11 @@ void Fluid::FiniteDifference()
     // just like a real fluid
     // evaluates gradients in the direction of flow
 
-    const double t_step = 0.0001;
+    const double t_step = 0.005;
     const double x_step = 0.01;
     const double a = t_step/x_step;
 
     VectorField* new_u = (new VectorField(*u));
-    new_u->norm_coeff = 0;
 
     for (unsigned int i = 0; i < x_size; ++i)
     {
@@ -81,14 +82,6 @@ void Fluid::FiniteDifference()
                     double& a_w = (*(*u)(i, j, k-sign))(2);
                     w_1 += a*w_0*(w_a - w_0) + (pow(a,2.0)/t_step)*k_visc*(w_a - 2*w_0 + a_w); 
                 }
-
-                double magnitude = (*new_u)(i, j, k)->Magnitude();
-
-                if (magnitude > new_u->norm_coeff)
-                {
-                    new_u->norm_coeff = magnitude;
-                }
-
             }
         }
     }
