@@ -2,7 +2,9 @@ Flowtopia
 ========
 A fluid dynamics repository that simply works.
 
-<sub><sup>for special cases<sup><sub>
+<sub><sup>in special cases<sup><sub>
+
+![](images/vortex.gif)
 
 Dependencies
 -------- 
