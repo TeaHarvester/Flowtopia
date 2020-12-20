@@ -41,7 +41,7 @@ void Fluid::FiniteDifference()
     // just like a real fluid
     // evaluates gradients in the direction of flow
 
-    const double t_step = 0.005;
+    const double t_step = 0.00005;
     const double x_step = 0.01;
     const double a = t_step/x_step;
 

@@ -5,10 +5,10 @@ OBJS = main.o graphicobject.o fluid.o field.o helpers.o
 Flowtopia: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-main.o: src/main.cpp src/field.cpp src/helpers.cpp
+main.o: src/main.cpp src/graphicobject.cpp src/fluid.cpp src/field.cpp src/helpers.cpp
 	$(CXX) $(CXXFLAGS) -c src/main.cpp
 
-graphicobject.o: src/fluid.cpp
+graphicobject.o: src/graphicobject.cpp src/fluid.cpp
 	$(CXX) $(CXXFLAGS) -c src/graphicobject.cpp
 
 fluid.o: src/fluid.cpp src/field.cpp src/helpers.cpp

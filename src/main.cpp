@@ -14,13 +14,6 @@ int main(int argc, char **argv)
     Fluid f(10, 10, 10, 0.001);
 
     f.InitialiseVortex();
-    // // f.PrintFluid();
-    // // for (int i = 0; i < 50000; ++i)
-    // // {
-    // //     f.FiniteDifference();
-    // // }
-
-    // // f.PrintFluid();
 
     GraphicObject g(f);
     gl_input = &g;
@@ -63,7 +56,7 @@ void Render()
 
         // vertex shader
         float n = -1.0f;
-        float f = -2.0f;
+        float f = -10.0f;
 
         float w = -VAO[vertex_ptr + 2];
         float x = (VAO[vertex_ptr] * n) / w;
