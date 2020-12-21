@@ -16,7 +16,8 @@ struct GraphicObject
     Fluid* source;
     Quaternion<float> orientation;
     void GetArrowVertexArray();
-    void Orient();
+    void OrientGrid(Quaternion<float> orient);
+    void OrientArrows();
     GraphicObject(Fluid& f);
     ~GraphicObject();
 };

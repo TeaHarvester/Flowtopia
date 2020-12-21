@@ -32,9 +32,9 @@ int main(int argc, char **argv)
     glEnable(GL_BLEND);
 
     // register callbacks
+    glutKeyboardFunc(ProcessNormalKeys);
     glutDisplayFunc(Render);
     glutTimerFunc(15, Timer, 0);
-    glutKeyboardFunc(ProcessNormalKeys);
 
     // enter the processing loop
     glutMainLoop();
@@ -49,6 +49,9 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     float* VAO = gl_input->grid_vertex_array;
+
+    gl_input->OrientGrid(gl_input->orientation);
+    gl_input->OrientArrows();
 
     // render grid
     glLineWidth(1.0);
@@ -71,24 +74,26 @@ void Render()
     }
     glEnd();
 
+    gl_input->OrientGrid(gl_input->orientation.Conj());
+
     // render arrows
 
-    unsigned int n_arrows = gl_input->source->x_size*gl_input->source->y_size*gl_input->source->z_size;
+    unsigned int n_arrows = gl_input->n_arrow_vertices;
     VAO = gl_input->arrow_vertex_array;
 
     glLineWidth(3.0);
     glBegin(GL_LINES);
     for (unsigned int i = 0; i < n_arrows; ++i)
     {   
-        // arrowheads
-        float xh = VAO[i*7] + 1.5*VAO[i*7 + 3];
-        float yh = VAO[i*7 + 1] + 1.5*VAO[i*7 + 4];
-        float zh = VAO[i*7 + 2] + 1.5*VAO[i*7 + 5];
-
         // arrow tails
-        float xt = VAO[i*7];
-        float yt = VAO[i*7 + 1];
-        float zt = VAO[i*7 + 2];
+        float xt = VAO[i*14];
+        float yt = VAO[i*14 + 1];
+        float zt = VAO[i*14 + 2];
+
+        // arrow heads
+        float xh = VAO[i*14 + 7];
+        float yh = VAO[i*14 + 8];
+        float zh = VAO[i*14 + 9];
 
         // vertex shader
         float n = -1.0f;
@@ -104,9 +109,9 @@ void Render()
         yh *= n / w;
         zh = ((zh * (-(f + n) / (f - n))) - (2*n*f / (f - n))) / w;
 
-        glColor4f(0.5f - 0.5f*VAO[i*7 + 6], 0.0f, 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
+        glColor4f(VAO[i*14 + 3], VAO[i*14 + 4], VAO[i*14 + 5], VAO[i*14 + 5]);
         glVertex3f(xt, yt, zt);
-        glColor4f(0.0f + VAO[i*7 + 6], 0.0f, 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
+        glColor4f(VAO[i*14 + 10], VAO[i*14 + 11], VAO[i*14 + 12], VAO[i*14 + 13]);
         glVertex3f(xh, yh, zh);
     }
     glEnd();
@@ -124,12 +129,29 @@ void Timer(int state)
 
 void ProcessNormalKeys(unsigned char key, int x, int y)
 {
+    Quaternion<float> rotation(0.0f, 0.0f, 0.0f, 0.0f);
+    float angle = pi/24;
+
     switch(key)
     {
         case 97:
-        Quaternion<float> rotation = Quaternion<float>(cos(pi/12), 0.0f, sin(pi/12), 0.0f);
+        rotation = Quaternion<float>(cos(angle), 0.0f, sin(angle), 0.0f);
         gl_input->orientation = rotation*gl_input->orientation;
-        gl_input->Orient();
+        break;
+
+        case 100:
+        rotation = Quaternion<float>(cos(-angle), 0.0f, sin(-angle), 0.0f);
+        gl_input->orientation = rotation*gl_input->orientation;
+        break;
+
+        case 119:
+        rotation = Quaternion<float>(cos(angle), sin(angle), 0.0f, 0.0f);
+        gl_input->orientation = rotation*gl_input->orientation;
+        break;
+
+        case 115:
+        rotation = Quaternion<float>(cos(-angle), sin(-angle), 0.0f, 0.0f);
+        gl_input->orientation = rotation*gl_input->orientation;
         break;
     }
 }

@@ -19,60 +19,90 @@ void GraphicObject::GetArrowVertexArray()
         {
             for (unsigned int i = 0; i < lx; ++i)
             {
-                unsigned int iterator = 7*(((ly*k) + j)*lx + i);
+                unsigned int iterator = 14*(((ly*k) + j)*lx + i);
+                Vector3<double>* flow = (*source->u)(i + 1, j + 1, k + 1);
+                float magnitude = (float)flow->Magnitude()/norm_coeff;
 
+                //arrow tails
                 arrow_vertex_array[iterator] = ((float)i + 1.5f)*dx - 1.0f;
                 arrow_vertex_array[iterator + 1] = ((float)j + 1.5f)*dy - 1.0f;
-                arrow_vertex_array[iterator + 2] = ((float)k + 0.5f)*dz + 1.0f;
+                arrow_vertex_array[iterator + 2] = ((float)k + 1.5f)*dz + 1.0f;
 
-                // temporarily store vector field in vertex colour array
-                Vector3<double>* flow = (*source->u)(i + 1, j + 1, k + 1);
+                //arrow heads
+                arrow_vertex_array[iterator + 7] = arrow_vertex_array[iterator] + dx*(float)(*flow)(0)/norm_coeff;
+                arrow_vertex_array[iterator + 8] = arrow_vertex_array[iterator + 1] + dy*(float)(*flow)(1)/norm_coeff;
+                arrow_vertex_array[iterator + 9] = arrow_vertex_array[iterator + 2] + dz*(float)(*flow)(2)/norm_coeff;
 
-                arrow_vertex_array[iterator + 3] = dx*(float)(*flow)(0)/norm_coeff;
-                arrow_vertex_array[iterator + 4] = dy*(float)(*flow)(1)/norm_coeff;
-                arrow_vertex_array[iterator + 5] = dz*(float)(*flow)(2)/norm_coeff;
-                arrow_vertex_array[iterator + 6] = (float)flow->Magnitude()/norm_coeff;
+                // colours
+                arrow_vertex_array[iterator + 3] = 0.5f - 0.5f*magnitude;
+                arrow_vertex_array[iterator + 4] = 0.0f;
+                arrow_vertex_array[iterator + 5] = 1.0f - magnitude;
+                arrow_vertex_array[iterator + 6] = magnitude;
+
+                arrow_vertex_array[iterator + 10] = 0.0f + magnitude;
+                arrow_vertex_array[iterator + 11] = 0.0f;
+                arrow_vertex_array[iterator + 12] = 1.0f - magnitude;
+                arrow_vertex_array[iterator + 13] = magnitude;
             }
         }
     }
 }
 
-void GraphicObject::Orient()
+void GraphicObject::OrientGrid(Quaternion<float> orient)
 {
-    // change basis vectors from screen space to world space
-    float z_displacement = 2.0f*((float)source->z_size - 2.0f)/((float)source->z_size + 2.0f);
+   // change basis vectors from screen space to world space
+   // float z_displacement = 2.0f*((float)source->z_size - 2.0f)/((float)source->z_size + 2.0f);
+   // orient grid
+    float z_displacement = 2.0f;
+    Quaternion<float> rotated(0.0f, 0.0f, 0.0f, 0.0f);
 
     for (unsigned int i = 0; i < n_grid_vertices; ++i)
     {
-        Quaternion<float> rotated = (orientation*Quaternion<float>(0.0,
-                                                      grid_vertex_array[7*i],
-                                                      grid_vertex_array[7*i + 1],
-                                                      grid_vertex_array[7*i + 2] - z_displacement))
-                                    *orientation.Conj();
+        rotated = (orient*Quaternion<float>(0.0,
+                                     grid_vertex_array[7*i],
+                                     grid_vertex_array[7*i + 1],
+                                     grid_vertex_array[7*i + 2] - z_displacement))
+                                    *orient.Conj();
 
         grid_vertex_array[7*i] = rotated.i_vector(0);
         grid_vertex_array[7*i + 1] = rotated.i_vector(1);
         grid_vertex_array[7*i + 2] = rotated.i_vector(2) + z_displacement;
     }
-
-    // for (unsigned int i = 0; i < n_arrow_vertices; ++i)
-    // {
-    //     Quaternion<float> rotated = (orientation*Quaternion<float>(0.0,
-    //                                                   arrow_vertex_array[7*i],
-    //                                                   arrow_vertex_array[7*i + 1],
-    //                                                   arrow_vertex_array[7*i + 2]))
-    //                                 *orientation.Conj();
-
-    //     arrow_vertex_array[7*i] = rotated.i_vector(0);
-    //     arrow_vertex_array[7*i + 1] = rotated.i_vector(1);
-    //     arrow_vertex_array[7*i + 2] = rotated.i_vector(2);
-    // }
 }
+    void GraphicObject::OrientArrows()
+    {
+        float z_displacement = 2.0f;
+        Quaternion<float> rotated(0.0f, 0.0f, 0.0f, 0.0f);
+
+        for (unsigned int i = 0; i < n_arrow_vertices; ++i)
+        {
+            rotated = (orientation*Quaternion<float>(0.0,
+                                        arrow_vertex_array[14*i],
+                                        arrow_vertex_array[14*i + 1],
+                                        arrow_vertex_array[14*i + 2] - z_displacement))
+                                        *orientation.Conj();
+
+            arrow_vertex_array[14*i] = rotated.i_vector(0);
+            arrow_vertex_array[14*i + 1] = rotated.i_vector(1);
+            arrow_vertex_array[14*i + 2] = rotated.i_vector(2) + z_displacement;
+
+            rotated = (orientation*Quaternion<float>(0.0,
+                                        arrow_vertex_array[14*i + 7],
+                                        arrow_vertex_array[14*i + 8],
+                                        arrow_vertex_array[14*i + 9] - z_displacement))
+                                        *orientation.Conj();
+
+            arrow_vertex_array[14*i + 7] = rotated.i_vector(0);
+            arrow_vertex_array[14*i + 8] = rotated.i_vector(1);
+            arrow_vertex_array[14*i + 9] = rotated.i_vector(2) + z_displacement;
+        }
+    }
+
 
 GraphicObject::GraphicObject(Fluid& F)
 :
 source(&F),
-orientation(1.0, 0.0, 0.0, 0.0)
+orientation(cos(-0.35), -sin(-0.35)/sqrt(3), sin(-0.35)/sqrt(3), -sin(-0.35)/sqrt(3))
 {
     // assign vertices ignoring boundary layer
     unsigned int lx = source->x_size - 2;
@@ -90,7 +120,7 @@ orientation(1.0, 0.0, 0.0, 0.0)
 
     grid_vertex_array = new float[7*n_grid_vertices];
     grid_index_array = new unsigned int[n_grid_indices];
-    arrow_vertex_array = new float[7*n_arrow_vertices];
+    arrow_vertex_array = new float[14*n_arrow_vertices];
 
     unsigned int vertex_iterator = 0;
     unsigned int index_iterator = 0;
@@ -105,7 +135,7 @@ orientation(1.0, 0.0, 0.0, 0.0)
                 {
                     grid_vertex_array[7*vertex_iterator] = ((float)i + 1.0f)*dx - 1.0f;
                     grid_vertex_array[7*vertex_iterator + 1] = ((float)j + 1.0f)*dy - 1.0f;
-                    grid_vertex_array[7*vertex_iterator + 2] = (float)k*dz + 1.0f;
+                    grid_vertex_array[7*vertex_iterator + 2] = ((float)k + 1.0f)*dz + 1.0f;
                     grid_vertex_array[7*vertex_iterator + 3] = 0.2f;
                     grid_vertex_array[7*vertex_iterator + 4] = 0.2f;
                     grid_vertex_array[7*vertex_iterator + 5] = 0.25f;
@@ -167,7 +197,7 @@ orientation(1.0, 0.0, 0.0, 0.0)
         {
             grid_vertex_array[7*vertex_iterator] = ((float)i + 1.0f)*dx - 1.0f;
             grid_vertex_array[7*vertex_iterator + 1] = ((float)j + 1.0f)*dy - 1.0f;
-            grid_vertex_array[7*vertex_iterator + 2] = 1.0f;
+            grid_vertex_array[7*vertex_iterator + 2] = (float)dz + 1.0f;
             grid_vertex_array[7*vertex_iterator + 3] = 0.2f;
             grid_vertex_array[7*vertex_iterator + 4] = 0.2f;
             grid_vertex_array[7*vertex_iterator + 5] = 0.25f;
@@ -179,7 +209,7 @@ orientation(1.0, 0.0, 0.0, 0.0)
             
             grid_vertex_array[7*vertex_iterator] = ((float)i + 1.0f)*dx - 1.0f;
             grid_vertex_array[7*vertex_iterator + 1] = ((float)j + 1.0f)*dy - 1.0f;
-            grid_vertex_array[7*vertex_iterator + 2] = lz*dz + 1.0f;
+            grid_vertex_array[7*vertex_iterator + 2] = (lz + 1.0f)*dz + 1.0f;
             grid_vertex_array[7*vertex_iterator + 3] = 0.4f;
             grid_vertex_array[7*vertex_iterator + 4] = 0.2f;
             grid_vertex_array[7*vertex_iterator + 5] = 0.25f;
