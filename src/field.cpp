@@ -1,6 +1,6 @@
 #include"field.h"
 
-Vector3*& VectorField::operator() (unsigned int x, unsigned int y, unsigned int z)
+Vector3<double>*& VectorField::operator() (unsigned int x, unsigned int y, unsigned int z)
 {
     return map[x + (y*x_size) + (z*x_size*y_size)];
 }
@@ -12,11 +12,11 @@ y_size(y_dim),
 z_size(z_dim),
 norm_coeff(0.0)
 {
-    map = new Vector3*[x_size * y_size * z_size];
+    map = new Vector3<double>*[x_size * y_size * z_size];
 
     for (unsigned int i = 0; i < x_size * y_size * z_size; ++i)
     {
-        map[i] = new Vector3();
+        map[i] = new Vector3<double>();
     }
 }
 
@@ -27,17 +27,22 @@ y_size(copy.y_size),
 z_size(copy.z_size),
 norm_coeff(copy.norm_coeff)
 {
-    map = new Vector3*[x_size * y_size * z_size];
+    map = new Vector3<double>*[x_size*y_size*z_size];
 
     for (unsigned int i = 0; i < x_size * y_size * z_size; ++i)
     {
-        map[i] = new Vector3(*copy.map[i]);
+        map[i] = new Vector3<double>(*copy.map[i]);
     }
 
 }
 
 VectorField::~VectorField()
 {
+    for (unsigned int i = 0; i < x_size*y_size*z_size; ++i)
+    {
+        delete map[i];
+    }
+
     delete map;
 }
 

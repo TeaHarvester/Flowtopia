@@ -1,24 +1,27 @@
 CXXFLAGS = -Wall -g -Iinclude -Llib
 LDFLAGS = -lfreeglut -lopengl32 #-Wl,--subsystem,windows
-OBJS = main.o graphicobject.o fluid.o field.o helpers.o
+OBJS = main.o graphicobject.o fluid.o field.o vector3.o quaternion.o
 
 Flowtopia: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-main.o: src/main.cpp src/graphicobject.cpp src/fluid.cpp src/field.cpp src/helpers.cpp
+main.o: src/main.cpp src/graphicobject.cpp src/fluid.cpp src/field.cpp src/vector3.cpp src/quaternion.cpp
 	$(CXX) $(CXXFLAGS) -c src/main.cpp
 
-graphicobject.o: src/graphicobject.cpp src/fluid.cpp
+graphicobject.o: src/graphicobject.cpp src/fluid.cpp src/vector3.cpp src/quaternion.cpp
 	$(CXX) $(CXXFLAGS) -c src/graphicobject.cpp
 
-fluid.o: src/fluid.cpp src/field.cpp src/helpers.cpp
+fluid.o: src/fluid.cpp src/field.cpp src/vector3.cpp
 	$(CXX) $(CXXFLAGS) -c src/fluid.cpp
 
-field.o: src/field.cpp src/helpers.cpp
+field.o: src/field.cpp src/vector3.cpp
 	$(CXX) $(CXXFLAGS) -c src/field.cpp
 
-helpers.o: src/helpers.cpp
-	$(CXX) $(CXXFLAGS) -c src/helpers.cpp
+vector3.o: src/vector3.cpp
+	$(CXX) $(CXXFLAGS) -c src/vector3.cpp
+
+quaternion.o: src/quaternion.cpp src/vector3.cpp
+	$(CXX) $(CXXFLAGS) -c src/quaternion.cpp
 
 clean:
 	-rm -f *.o core *.core

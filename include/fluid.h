@@ -17,7 +17,6 @@ class Fluid
     private:
     double k_visc;
     ScalarField* density;
-
 };
 
 #endif

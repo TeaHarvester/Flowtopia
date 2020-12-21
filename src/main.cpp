@@ -2,10 +2,11 @@
 #include<GL/glut.h>
 #include"graphicobject.h"
 #include"fluid.h"
+#define pi 3.1415926535f
 
 void Render();
-
 void Timer(int state);
+void ProcessNormalKeys(unsigned char key, int x, int y);
 
 GraphicObject* gl_input;
 
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
 
     GraphicObject g(f);
     gl_input = &g;
+
 
     // initialise freeglut and open window
     glutInit(&argc, argv);
@@ -32,6 +34,7 @@ int main(int argc, char **argv)
     // register callbacks
     glutDisplayFunc(Render);
     glutTimerFunc(15, Timer, 0);
+    glutKeyboardFunc(ProcessNormalKeys);
 
     // enter the processing loop
     glutMainLoop();
@@ -101,9 +104,9 @@ void Render()
         yh *= n / w;
         zh = ((zh * (-(f + n) / (f - n))) - (2*n*f / (f - n))) / w;
 
-        glColor4f(1.0f - VAO[i*7 + 6], 0.0f + VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
+        glColor4f(0.5f - 0.5f*VAO[i*7 + 6], 0.0f, 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
         glVertex3f(xt, yt, zt);
-        glColor4f(0.0f + VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
+        glColor4f(0.0f + VAO[i*7 + 6], 0.0f, 1.0f - VAO[i*7 + 6], VAO[i*7 + 6]);
         glVertex3f(xh, yh, zh);
     }
     glEnd();
@@ -117,4 +120,16 @@ void Timer(int state)
     gl_input->GetArrowVertexArray();
     glutPostRedisplay();
     glutTimerFunc(15, Timer, state);
+}
+
+void ProcessNormalKeys(unsigned char key, int x, int y)
+{
+    switch(key)
+    {
+        case 97:
+        Quaternion<float> rotation = Quaternion<float>(cos(pi/12), 0.0f, sin(pi/12), 0.0f);
+        gl_input->orientation = rotation*gl_input->orientation;
+        gl_input->Orient();
+        break;
+    }
 }
