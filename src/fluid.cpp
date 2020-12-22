@@ -41,9 +41,8 @@ void Fluid::FiniteDifference()
     // just like a real fluid
     // evaluates gradients in the direction of flow
 
-    const double t_step = 0.005;
-    const double x_step = 0.01;
-    const double a = t_step/x_step;
+    const double a = dt/dl;
+    double& d = density;
 
     VectorField* new_u = (new VectorField(*u));
 
@@ -53,6 +52,8 @@ void Fluid::FiniteDifference()
         {
             for (unsigned int k = 0; k < z_size; ++k)
             {
+                double& p_0 = (*p)(i, j, k);
+
                 if (i != 0 && i != x_size - 1)
                 {                  
                     double& u_0 = (*(*u)(i, j, k))(0);
@@ -60,7 +61,8 @@ void Fluid::FiniteDifference()
                     double& u_1 = (*(*new_u)(i, j, k))(0);
                     double& u_a = (*(*u)(i+sign, j, k))(0);
                     double& a_u = (*(*u)(i-sign, j, k))(0);
-                    u_1 += a*u_0*(u_a - u_0) + (pow(a,2.0)/t_step)*k_visc*(u_a - 2*u_0 + a_u);
+                    double& p_a = (*p)(i+sign, j, k);
+                    u_1 += sign*a*(u_0*(u_a - u_0) - (p_a - p_0)/d) + (pow(a,2.0)/dt)*k_visc*(u_a - 2*u_0 + a_u);
                 }
 
                 if (j != 0 && j != y_size - 1)
@@ -70,7 +72,8 @@ void Fluid::FiniteDifference()
                     double& v_1 = (*(*new_u)(i, j, k))(1);
                     double& v_a = (*(*u)(i, j+sign, k))(1);
                     double& a_v = (*(*u)(i, j-sign, k))(1);
-                    v_1 += a*v_0*(v_a - v_0) + (pow(a,2.0)/t_step)*k_visc*(v_a - 2*v_0 + a_v);
+                    double& p_a = (*p)(i, j+sign, k);
+                    v_1 += sign*a*(v_0*(v_a - v_0) - (p_a - p_0)/d) + (pow(a,2.0)/dt)*k_visc*(v_a - 2*v_0 + a_v);
                 }
 
                 if (k != 0 && k != z_size - 1)
@@ -80,7 +83,8 @@ void Fluid::FiniteDifference()
                     double& w_1 = (*(*new_u)(i, j, k))(2);
                     double& w_a = (*(*u)(i, j, k+sign))(2);
                     double& a_w = (*(*u)(i, j, k-sign))(2);
-                    w_1 += a*w_0*(w_a - w_0) + (pow(a,2.0)/t_step)*k_visc*(w_a - 2*w_0 + a_w); 
+                    double& p_a = (*p)(i, j, k+sign);
+                    w_1 += sign*a*(w_0*(w_a - w_0) - (p_a - p_0)/d) + (pow(a,2.0)/dt)*k_visc*(w_a - 2*w_0 + a_w) - g*dt;
                 }
             }
         }
@@ -116,11 +120,31 @@ Fluid::Fluid(unsigned int x_dim, unsigned int y_dim, unsigned int z_dim, double 
 x_size(x_dim),
 y_size(y_dim),
 z_size(z_dim),
-k_visc(k_v)
+k_visc(k_v),
+g(9.81),
+p_atm(101325),
+density(1000),
+dl(0.01),
+dt(0.001)
 {
     u = new VectorField(x_size, y_size, z_size);
+    p = new ScalarField(x_size, y_size, z_size);
+
+    // hydrostatics
+    for (unsigned int i = 0; i < x_size; ++i)
+    {
+        for (unsigned int j = 0; j < y_size; ++j)
+        {
+            for (unsigned int k = 0; k < z_size; ++k)
+            {     
+                (*p)(i, j, k) = g*(z_size - k)*dl*density;
+            }
+        }
+    }
 }
 
 Fluid::~Fluid()
 {
+    delete u;
+    delete p;
 }

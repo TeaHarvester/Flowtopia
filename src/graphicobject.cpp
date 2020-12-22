@@ -102,7 +102,7 @@ void GraphicObject::OrientGrid(Quaternion<float> orient)
 GraphicObject::GraphicObject(Fluid& F)
 :
 source(&F),
-orientation(cos(-0.35), -sin(-0.35)/sqrt(3), sin(-0.35)/sqrt(3), -sin(-0.35)/sqrt(3))
+orientation(1.0f, 0.0f, 0.0f, 0.0f)
 {
     // assign vertices ignoring boundary layer
     unsigned int lx = source->x_size - 2;
