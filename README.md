@@ -6,7 +6,7 @@ A fluid dynamics repository that simply works.
 
 __Time evolution of a vortex with stationary boundaries:__ 
 
-![](images/vortex1.gif)
+![](images/vortex.gif)
 
 Dependencies
 -------- 
