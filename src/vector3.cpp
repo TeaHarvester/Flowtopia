@@ -33,6 +33,14 @@ Vector3<T> Vector3<T>::operator+(Vector3<T>& a)
     return Vector3<T>((*this)(1) + a(1), (*this)(2) + a(2), (*this)(3) + a(3));
 }
 
+template<typename T>
+void Vector3<T>::operator*=(T a)
+{
+    this->data[0] *= a;
+    this->data[1] *= a;
+    this->data[2] *= a;
+}
+
 // element-wise multiplication
 template<typename T>
 Vector3<T> Vector3<T>::operator*(Vector3<T>& a)

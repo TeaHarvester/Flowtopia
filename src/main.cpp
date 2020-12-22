@@ -13,7 +13,6 @@ GraphicObject* gl_input;
 int main(int argc, char **argv) 
 {
     Fluid f(10, 10, 10, 0.001);
-
     f.InitialiseVortex();
 
     GraphicObject g(f);
@@ -85,6 +84,11 @@ void Render()
     glBegin(GL_LINES);
     for (unsigned int i = 0; i < n_arrows; ++i)
     {   
+        if (VAO[i*14 + 6] == 0.0f)
+        {
+            continue;
+        }
+
         // arrow tails
         float xt = VAO[i*14];
         float yt = VAO[i*14 + 1];

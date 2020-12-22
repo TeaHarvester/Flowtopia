@@ -22,6 +22,7 @@ void GraphicObject::GetArrowVertexArray()
                 unsigned int iterator = 14*(((ly*k) + j)*lx + i);
                 Vector3<double>* flow = (*source->u)(i + 1, j + 1, k + 1);
                 float magnitude = (float)flow->Magnitude()/norm_coeff;
+                float scale_param = 1.5f;
 
                 //arrow tails
                 arrow_vertex_array[iterator] = ((float)i + 1.5f)*dx - 1.0f;
@@ -29,19 +30,24 @@ void GraphicObject::GetArrowVertexArray()
                 arrow_vertex_array[iterator + 2] = ((float)k + 1.5f)*dz + 1.0f;
 
                 //arrow heads
-                arrow_vertex_array[iterator + 7] = arrow_vertex_array[iterator] + dx*(float)(*flow)(0)/norm_coeff;
-                arrow_vertex_array[iterator + 8] = arrow_vertex_array[iterator + 1] + dy*(float)(*flow)(1)/norm_coeff;
-                arrow_vertex_array[iterator + 9] = arrow_vertex_array[iterator + 2] + dz*(float)(*flow)(2)/norm_coeff;
+                arrow_vertex_array[iterator + 7] = arrow_vertex_array[iterator] 
+                + scale_param*dx*(float)(*flow)(0)/norm_coeff;
+
+                arrow_vertex_array[iterator + 8] = arrow_vertex_array[iterator + 1] 
+                + scale_param*dy*(float)(*flow)(1)/norm_coeff;
+
+                arrow_vertex_array[iterator + 9] = arrow_vertex_array[iterator + 2] 
+                + scale_param*dz*(float)(*flow)(2)/norm_coeff;
 
                 // colours
-                arrow_vertex_array[iterator + 3] = 0.5f - 0.5f*magnitude;
+                arrow_vertex_array[iterator + 3] = 0.5f*magnitude;
                 arrow_vertex_array[iterator + 4] = 0.0f;
                 arrow_vertex_array[iterator + 5] = 1.0f - magnitude;
                 arrow_vertex_array[iterator + 6] = magnitude;
 
-                arrow_vertex_array[iterator + 10] = 0.0f + magnitude;
+                arrow_vertex_array[iterator + 10] = 0.5f + 0.5f*magnitude;
                 arrow_vertex_array[iterator + 11] = 0.0f;
-                arrow_vertex_array[iterator + 12] = 1.0f - magnitude;
+                arrow_vertex_array[iterator + 12] = 0.5f - 0.5f*magnitude;
                 arrow_vertex_array[iterator + 13] = magnitude;
             }
         }
@@ -102,7 +108,7 @@ void GraphicObject::OrientGrid(Quaternion<float> orient)
 GraphicObject::GraphicObject(Fluid& F)
 :
 source(&F),
-orientation(1.0f, 0.0f, 0.0f, 0.0f)
+orientation(1/sqrt(2), -1/sqrt(2), 0.0f, 0.0f)
 {
     // assign vertices ignoring boundary layer
     unsigned int lx = source->x_size - 2;
@@ -201,7 +207,7 @@ orientation(1.0f, 0.0f, 0.0f, 0.0f)
             grid_vertex_array[7*vertex_iterator + 3] = 0.2f;
             grid_vertex_array[7*vertex_iterator + 4] = 0.2f;
             grid_vertex_array[7*vertex_iterator + 5] = 0.25f;
-            grid_vertex_array[7*vertex_iterator + 6] = 1.0f;
+            grid_vertex_array[7*vertex_iterator + 6] = 0.25f;
 
             grid_index_array[index_iterator] = vertex_iterator;
             ++index_iterator;

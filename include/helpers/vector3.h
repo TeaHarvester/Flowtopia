@@ -15,6 +15,7 @@ struct Vector3
     void operator=(Vector3<T>& a);
     void operator+=(Vector3<T>& a);
     Vector3<T> operator+(Vector3<T>& a);
+    void operator*=(T a);
     Vector3<T> operator*(Vector3<T>& a);
     Vector3<T> operator/(T a);
     Vector3<T> operator/(Vector3<T>& a);
