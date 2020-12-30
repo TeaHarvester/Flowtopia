@@ -69,6 +69,16 @@ double Vector3<T>::Dot(Vector3<T>& operand)
 }
 
 template<typename T>
+Vector3<T> Vector3<T>::Cross(Vector3<T>& operand)
+{
+    T i = data[1]*operand.data[2] - data[2]*operand.data[1];
+    T j = data[2]*operand.data[0] - data[0]*operand.data[2];
+    T k = data[0]*operand.data[1] - data[1]*operand.data[0];
+
+    return Vector3<T>(i, j, k);
+}
+
+template<typename T>
 double Vector3<T>::Magnitude()
 {
     return sqrt(this->Dot(*this));

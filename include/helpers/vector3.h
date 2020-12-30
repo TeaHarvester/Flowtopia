@@ -10,6 +10,7 @@ struct Vector3
     T data[3];
 
     double Dot(Vector3<T>& operand);
+    Vector3<T> Cross(Vector3<T>& operand);
     double Magnitude();
     T& operator()(unsigned int i);
     void operator=(Vector3<T>& a);

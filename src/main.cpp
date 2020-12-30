@@ -12,9 +12,10 @@ GraphicObject* gl_input;
 
 int main(int argc, char **argv) 
 {
-    Fluid f(10, 10, 10, 0.001);
-    f.InitialiseVortex();
-
+    Fluid f(19, 19, 19, 0.001);
+    f.object = new RigidBody(Vector3<double>(5, 9, 9), 4);
+    f.InitialiseFlow(Vector3<double>(1, 0, 0));
+ 
     GraphicObject g(f);
     gl_input = &g;
 
@@ -128,7 +129,7 @@ void Timer(int state)
     gl_input->source->FiniteDifference();
     gl_input->GetArrowVertexArray();
     glutPostRedisplay();
-    glutTimerFunc(15, Timer, state);
+    glutTimerFunc(5, Timer, state);
 }
 
 void ProcessNormalKeys(unsigned char key, int x, int y)
@@ -138,6 +139,10 @@ void ProcessNormalKeys(unsigned char key, int x, int y)
 
     switch(key)
     {
+        case 32:
+        gl_input->source->FiniteDifference();
+        break;
+
         case 97:
         rotation = Quaternion<float>(cos(angle), 0.0f, sin(angle), 0.0f);
         gl_input->orientation = rotation*gl_input->orientation;
